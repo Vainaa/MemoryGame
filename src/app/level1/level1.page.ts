@@ -1,3 +1,4 @@
+import { ThisReceiver } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -7,9 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class Level1Page implements OnInit {
 
-  public cardsTotal =12; // Total cards to match on Easy mode
+  public cardsTotal =8; // Total cards to match on Easy mode
   public cardsArray = []; // Store all card pairs
-  public playerLife = 4; // Amount of tries player gets
+  public playerLife = 6; // Amount of tries player gets
   public imageDir = '../assets/img/Images/'; // Directory for images
   public imageArray = ['Audio','Camera','Controller','Film','Mic','Movie','Radio','TV'];
 
@@ -19,15 +20,14 @@ export class Level1Page implements OnInit {
   public selectCard1val = -1;  
   public selectCard2pos = -1;
   public selectCard2val = -1;
+  public selectOldpos = -1;
 
   public debugText ="Debugtext";
   
   constructor() { }
 
   ngOnInit() {
-    this.populateCards();
-    this.shuffle(this.cardsArray);
-    this.shuffle(this.imageArray);
+    this.resetGame();
   }
 
 
@@ -58,12 +58,54 @@ export class Level1Page implements OnInit {
   }
 
   //function to select a card
-  selectCard(pos, val){
+  selectCard(pos, val, i){
+    var actOne = false;
+
+    //Second card
+    if(this.selectCard1pos > -1 && this.selectCard2pos == -1) {
+      this.selectCard2pos = pos;
+      this.selectCard2val = val;
+      actOne = true;
+    }
+
     //First card
-    this.selectCard1pos = pos;
-    this.selectCard1val = val;
-    this.debugText = "POS: " + pos + " and val: " + val;
+    if(this.selectCard1pos == -1 && !actOne){
+      this.selectCard1pos = pos;
+      this.selectCard1val = val;
+      this.selectOldpos = i;
+    }
+      
+    // Both cards selected, check for match or fail
+    if(actOne && this.selectCard1pos > -1 && this.selectCard2pos > -1){
+      setTimeout(() => {
+        //if the cards match
+        if(this.selectCard1val == this.selectCard2val) {
+          this.debugText = "Cards match";
+          this.cardsArray.splice(this.selectOldpos, 1, {pos: this.selectOldpos, val: -1});
+          this.cardsArray.splice(i, 1, {pos: i, val: -1});
+          this.resetSelected();
+        } else {
+        //if they don't match
+          this.debugText = "Cards don't match";
+          this.playerLife -= 1;
+          this.resetSelected();
+          if(this.playerLife <= 0 ){
+            this.resetGame();
+          }
+        }
+        
+      }, 2000)
+    }
+    
   }
+  resetGame(){
+    this.playerLife = 6;
+    this.resetSelected();
+    this.populateCards();
+    this.shuffle(this.cardsArray);
+    this.shuffle(this.imageArray);
+  }
+
   //reset selected cards
   resetSelected(){
     this.selectCard1pos = -1;

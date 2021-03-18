@@ -1,6 +1,9 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Medium</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button icon="close"></ion-back-button>
+      <ion-title>Medium</ion-title>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -8,4 +11,36 @@
   <div align="center">
     <h2>Match all cards to win!</h2>
   </div>
+
+  <ion-row align-items-center text-center size="8">
+    <ion-col align-self-center size="3" style="margin-left: 7%;" *ngFor="let c of cardsArray; let i = index">
+      <!-- background -->
+      <img src="../assets/img/Cards/background.png" 
+      *ngIf="c.pos != selectCard1pos && c.pos != selectCard2pos && c.val > -1" 
+      (click)="selectCard(c.pos, c.val, i)" 
+      style="width:60px; height:60px; border: solid2px #000; border-radius: 12px;">
+
+      <!-- card  1-->
+      <img [src]="imageDir + imageArray[c.val] + '.png'" 
+      *ngIf="c.pos == selectCard1pos && c.val > -1"  
+      style="width:60px; height:60px; border: solid2px #000; border-radius: 12px;">
+
+      <!-- card  2-->
+      <img [src]="imageDir + imageArray[c.val] + '.png'" 
+      *ngIf="c.pos == selectCard2pos && c.val > -1"  
+      style="width:60px; height:60px; border: solid2px #000; border-radius: 12px;">
+
+      <!-- hidden card -->
+      <img
+      *ngIf="c.val == -1" 
+      style="width:60px; height:60px; border: solid2px #000; border-radius: 12px; visibility: hidden;">
+    </ion-col>
+  </ion-row>
+
+  <div align="center">
+    <h5>{{debugText}}</h5>
+    <h5>Player lives: {{playerLife}}</h5>
+    
+  </div>
+
 </ion-content>
